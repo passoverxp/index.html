@@ -481,6 +481,30 @@
   import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
   import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, where, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
+  async function executeSmartBudgetEngine() {
+  const renderBox = document.getElementById('smartBudgetContainer');
+  if (!renderBox) return;
+
+  // 1. If not premium, show the "Lock" screen instead of the engine
+  if (!isPremiumUser) {
+    renderBox.innerHTML = `
+      <div class="panel premium-panel">
+        <div class="premium-tag">PRO TIER ENGINE</div>
+        <div class="panel-title premium-title">Smart Budget Strategy</div>
+        <p style="font-size: 0.9rem; line-height: 1.6; margin-bottom: 20px; color: #a5a5cc;">
+          Upgrade to Premium to unlock AI-powered budget mapping, behavioral spending adjustments, and automatic reserve calculations.
+        </p>
+        <button class="submit-btn premium-btn" onclick="triggerPremiumMockUpgrade()">Unlock Pro Engine</button>
+      </div>
+    `;
+    return; // Exit here; the free dashboard remains visible below
+  }
+
+  // 2. If user IS premium, run the engine as normal
+  // (Your existing engine calculation code continues here...)
+  const currentMonthStr = getRelativeMonthString(0);
+  // ... rest of your original logic ...
+}
   const firebaseConfig = {
     apiKey: "AIzaSyAkBKhyDepFOkpE0II9GgjwSO5G1CH9A_4", 
     authDomain: "index-1d611.firebaseapp.com",
