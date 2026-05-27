@@ -18,6 +18,11 @@
     --muted: #6b6b88;
     --income: #00e5a0;
     --expense: #ff6b6b;
+    
+    /* Premium Visual Design Tokens */
+    --premium-grad: linear-gradient(135deg, #16122c 0%, #0b071e 100%);
+    --gold: #ffd700;
+    --gold-glow: rgba(255, 215, 0, 0.15);
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -44,10 +49,7 @@
     z-index: 0;
   }
 
-  /* Crucial rule for switching screens */
-  .hidden {
-    display: none !important;
-  }
+  .hidden { display: none !important; }
 
   .container {
     max-width: 1100px;
@@ -154,7 +156,6 @@
     margin-bottom: 40px;
   }
 
-  /* Add Transaction Form */
   .panel {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -226,10 +227,9 @@
     letter-spacing: 0.5px; margin-top: 8px; transition: all 0.2s;
     text-transform: uppercase;
   }
-
   .submit-btn:hover { background: #00ffb3; transform: translateY(-1px); box-shadow: 0 8px 20px rgba(0,229,160,0.3); }
 
-  /* Chart */
+  /* Chart Elements */
   .chart-section { margin-bottom: 24px; }
   .chart-bars { display: flex; align-items: flex-end; gap: 6px; height: 80px; padding: 8px 0; }
   .bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; height: 100%; justify-content: flex-end; }
@@ -241,7 +241,7 @@
   .legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.7rem; color: var(--muted); }
   .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
 
-  /* Transaction List */
+  /* Transaction Rows */
   .tx-list { display: flex; flex-direction: column; gap: 10px; }
   .tx-item {
     display: flex; align-items: center; justify-content: space-between; padding: 14px 16px;
@@ -266,7 +266,7 @@
   .empty-state { text-align: center; padding: 40px 20px; color: var(--muted); font-size: 0.8rem; line-height: 1.8; }
   .empty-state .emoji { font-size: 2rem; display: block; margin-bottom: 12px; }
 
-  /* Categories */
+  /* Chips */
   .categories { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
   .cat-chip {
     padding: 5px 10px; border-radius: 20px; border: 1px solid var(--border);
@@ -275,7 +275,7 @@
   }
   .cat-chip:hover, .cat-chip.selected { border-color: var(--accent); color: var(--accent); background: rgba(0,229,160,0.08); }
 
-  /* Login / Overlays */
+  /* Overlays */
   .login-container {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg);
     display: flex; align-items: center; justify-content: center; z-index: 100;
@@ -285,7 +285,50 @@
     padding: 40px; width: 100%; max-width: 400px; box-shadow: 0 20px 40px rgba(0,0,0,0.5);
   }
 
-  /* Animations */
+  /* PREMIUM UI CORE HOOKS */
+  .premium-panel {
+    background: var(--premium-grad);
+    border: 1px solid var(--gold);
+    box-shadow: 0 0 25px var(--gold-glow);
+    position: relative;
+    overflow: hidden;
+    animation: premiumEntrance 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  
+  .premium-tag {
+    position: absolute;
+    top: 14px; right: 14px;
+    font-size: 0.55rem; font-weight: 800;
+    color: var(--bg); background: var(--gold);
+    padding: 3px 8px; border-radius: 4px;
+    letter-spacing: 1px; text-transform: uppercase;
+  }
+
+  .premium-title::before { background: var(--gold) !important; }
+
+  /* Progress Arc Bar */
+  .progress-container {
+    background: var(--surface2); height: 12px; border-radius: 6px;
+    overflow: hidden; display: flex; margin: 16px 0; border: 1px solid var(--border);
+  }
+  .progress-fill-spend { background: var(--accent2); transition: width 0.4s ease; }
+  .progress-fill-reserve { background: var(--gold); transition: width 0.4s ease; }
+
+  .premium-btn {
+    background: linear-gradient(90deg, var(--gold) 0%, #f59e0b 100%) !important;
+    color: #0a0a0f !important; font-weight: 800 !important;
+    box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+  }
+  .premium-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 22px rgba(245, 158, 11, 0.5); }
+
+  .metric-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 18px 0; }
+  .metric-box { background: rgba(255,255,255,0.03); padding: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05); }
+  .metric-val { font-family: 'Syne', sans-serif; font-size: 1.25rem; font-weight: 700; margin-top: 4px; }
+
+  @keyframes premiumEntrance {
+    from { opacity: 0; transform: scale(0.97) translateY(10px); filter: blur(4px); }
+    to { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
+  }
   @keyframes fadeDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
   @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
 </style>
@@ -335,7 +378,7 @@
       <button id="navCoach" class="nav-btn" onclick="switchScreen('coachScreen', 'navCoach')">Financial Coach</button>
     </nav>
     <div class="logo">Fin<span>Track</span></div>
-    <div class="badge">Stage 1 — Beta</div>
+    <div class="badge" id="appBadge">Stage 1 — Beta</div>
   </header>
 
   <div id="coachScreen" class="hidden">
@@ -364,6 +407,8 @@
       </div>
     </div>
 
+    <div id="smartBudgetContainer" style="margin-bottom: 24px;"></div>
+
     <div class="main-grid">
       <div>
         <div class="panel chart-section" style="margin-bottom:24px;">
@@ -381,32 +426,51 @@
         </div>
       </div>
 
-      <div class="panel" style="height:fit-content; position:sticky; top:24px;">
-        <div class="panel-title">Add Transaction</div>
-        <div class="form-group">
-          <label>Type</label>
-          <div class="type-toggle">
-            <button class="type-btn active income" onclick="setType('income')">+ Income</button>
-            <button class="type-btn expense" onclick="setType('expense')">− Expense</button>
+      <div style="display: flex; flex-direction: column; gap: 24px; height: fit-content; position: sticky; top: 24px;">
+        
+        <div class="panel">
+          <div class="panel-title">Add Transaction</div>
+          <div class="form-group">
+            <label>Type</label>
+            <div class="type-toggle">
+              <button class="type-btn active income" onclick="setType('income')">+ Income</button>
+              <button class="type-btn expense" onclick="setType('expense')">− Expense</button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Description</label>
+            <input type="text" id="desc" placeholder="e.g. Freelance payment" />
+          </div>
+          <div class="form-group">
+            <label>Amount ($)</label>
+            <input type="number" id="amount" placeholder="0.00" min="0" step="0.01" />
+          </div>
+          <div class="form-group">
+            <label>Category</label>
+            <div class="categories" id="catChips"></div>
+          </div>
+          <div class="form-group">
+            <label>Date</label>
+            <input type="date" id="date" />
+          </div>
+          <button class="submit-btn" onclick="addTransaction()">Add Transaction</button>
+        </div>
+
+        <div class="panel" id="savingsGoalPanel">
+          <div class="panel-title">Savings Goal</div>
+          <div id="savingsGoalUIContent">
+            <div class="form-group">
+              <label>Target Amount ($)</label>
+              <input type="number" id="goalAmount" placeholder="e.g. 5000" min="1" step="1"/>
+            </div>
+            <div class="form-group">
+              <label>Target Date</label>
+              <input type="date" id="goalDate" />
+            </div>
+            <button class="submit-btn" onclick="saveSavingsGoal()">Set Target Engine</button>
           </div>
         </div>
-        <div class="form-group">
-          <label>Description</label>
-          <input type="text" id="desc" placeholder="e.g. Freelance payment" />
-        </div>
-        <div class="form-group">
-          <label>Amount ($)</label>
-          <input type="number" id="amount" placeholder="0.00" min="0" step="0.01" />
-        </div>
-        <div class="form-group">
-          <label>Category</label>
-          <div class="categories" id="catChips"></div>
-        </div>
-        <div class="form-group">
-          <label>Date</label>
-          <input type="date" id="date" />
-        </div>
-        <button class="submit-btn" onclick="addTransaction()">Add Transaction</button>
+
       </div>
     </div>
   </div>
@@ -417,7 +481,6 @@
   import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
   import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, where, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-  // Real configured matching values requested
   const firebaseConfig = {
     apiKey: "AIzaSyAkBKhyDepFOkpE0II9GgjwSO5G1CH9A_4", 
     authDomain: "index-1d611.firebaseapp.com",
@@ -436,11 +499,11 @@
   let selectedCat = '';
   let currentUser = null;
   let userName = 'there';
+  let isPremiumUser = false;
 
   const incomeCategories = ['💼 Salary', '🎯 Freelance', '📈 Investment', '🎁 Gift', '📦 Other'];
   const expenseCategories = ['🍔 Food', '🚗 Transport', '🏠 Rent', '💊 Health', '🎮 Fun', '📦 Other'];
 
-  // Sync state tracking across engine boundaries
   onAuthStateChanged(auth, async (user) => {
     if (user) {
       currentUser = user;
@@ -451,9 +514,13 @@
       
       if (userDocSnap.exists() && userDocSnap.data().setup_done) {
         userName = userDocSnap.data().name;
+        isPremiumUser = userDocSnap.data().isPremium === true;
         localStorage.setItem('fintrack_user_name', userName);
         document.getElementById('onboardingScreen').classList.add('hidden');
+        
+        updatePremiumBadgeStatus();
         await loadTransactions();
+        await loadSavingsGoalFields();
       } else {
         document.getElementById('onboardingScreen').classList.remove('hidden');
         document.getElementById('loginScreen').classList.add('hidden');
@@ -465,9 +532,21 @@
     }
   });
 
-  // Setup structural initializations
   document.getElementById('date').value = new Date().toISOString().split('T')[0];
   renderCategories();
+
+  function updatePremiumBadgeStatus() {
+    const badge = document.getElementById('appBadge');
+    if (isPremiumUser) {
+      badge.textContent = "PRO Tier";
+      badge.style.borderColor = "var(--gold)";
+      badge.style.color = "var(--gold)";
+    } else {
+      badge.textContent = "Stage 1 — Beta";
+      badge.style.borderColor = "var(--accent)";
+      badge.style.color = "var(--accent)";
+    }
+  }
 
   async function handleLogin() {
     let email = document.getElementById('username').value.trim();
@@ -475,13 +554,12 @@
     const btn = document.getElementById('loginBtn');
     
     if (!email || !pass) { alert("Please fill fields."); return; }
-    if (!email.includes('@')) email += "@fintrack.io"; // Seamless username mapping
+    if (!email.includes('@')) email += "@fintrack.io";
     
     btn.innerText = "Authenticating...";
     try {
       await signInWithEmailAndPassword(auth, email, pass);
     } catch (error) {
-      // Auto-register design handling if user profile does not exist
       if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
         try {
           await createUserWithEmailAndPassword(auth, email, pass);
@@ -504,7 +582,7 @@
       userName = name;
       localStorage.setItem('fintrack_user_name', name);
 
-      await setDoc(doc(db, "users", currentUser.uid), { name, setup_done: true });
+      await setDoc(doc(db, "users", currentUser.uid), { name, setup_done: true, isPremium: false });
 
       if (income > 0) {
         await addDoc(collection(db, "transactions"), {
@@ -521,6 +599,60 @@
       await loadTransactions();
     } else {
       alert("Please fill in valid details to continue.");
+    }
+  }
+
+  async function triggerPremiumMockUpgrade() {
+    if (!currentUser) return;
+    try {
+      const userDocRef = doc(db, "users", currentUser.uid);
+      await setDoc(userDocRef, { isPremium: true }, { merge: true });
+      isPremiumUser = true;
+      updatePremiumBadgeStatus();
+      alert("Upgrade Successful! Welcome to FinTrack Premium.");
+      await loadTransactions();
+      await loadSavingsGoalFields();
+    } catch (err) {
+      alert("Upgrade integration failed: " + err.message);
+    }
+  }
+
+  async function loadSavingsGoalFields() {
+    if (!currentUser) return;
+    const goalRef = doc(db, "users", currentUser.uid, "savingsGoal", "current");
+    try {
+      const snap = await getDoc(goalRef);
+      if (snap.exists()) {
+        const data = snap.data();
+        if(document.getElementById('goalAmount')) document.getElementById('goalAmount').value = data.targetAmount || '';
+        if(document.getElementById('goalDate')) document.getElementById('goalDate').value = data.targetDate || '';
+      }
+    } catch (e) {
+      console.error("Error retrieving goal configuration documents: ", e);
+    }
+  }
+
+  async function saveSavingsGoal() {
+    if (!currentUser) return;
+    if (!isPremiumUser) {
+      alert("Upgrade to Premium to set optimization targets.");
+      return;
+    }
+    const targetAmount = parseFloat(document.getElementById('goalAmount').value);
+    const targetDate = document.getElementById('goalDate').value;
+
+    if (isNaN(targetAmount) || targetAmount <= 0 || !targetDate) {
+      alert("Please fill in valid target operational fields.");
+      return;
+    }
+
+    try {
+      const goalRef = doc(db, "users", currentUser.uid, "savingsGoal", "current");
+      await setDoc(goalRef, { targetAmount, targetDate, timestamp: Date.now() });
+      alert("Savings Target parameters locked into the dynamic engine.");
+      await executeSmartBudgetEngine();
+    } catch (err) {
+      alert("Failed locking values: " + err.message);
     }
   }
 
@@ -541,10 +673,229 @@
       
       transactions.sort((a, b) => b.id - a.id);
       render();
+      await executeSmartBudgetEngine();
     } catch (error) {
       list.innerHTML = `<div class="empty-state" style="color:var(--expense)">Cloud error: ${error.message}</div>`;
     }
   }
+
+  /* =========================================================================
+     PREMIUM SMART BUDGET ENGINE CORE MECHANICAL UTILITIES
+     ========================================================================= */
+  function getRelativeMonthString(offsetMonths) {
+    const d = new Date();
+    d.setDate(1); // Eliminate day rollover boundary exceptions
+    d.setMonth(d.getMonth() + offsetMonths);
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+  }
+
+  async function executeSmartBudgetEngine() {
+    const renderBox = document.getElementById('smartBudgetContainer');
+    if (!renderBox) return;
+
+    if (!isPremiumUser) {
+      renderBox.innerHTML = `
+        <div class="panel premium-panel">
+          <div class="premium-tag">Premium Upgrade</div>
+          <div class="panel-title premium-title">Unlock Smart Budget Analysis</div>
+          <p style="font-size: 0.9rem; line-height: 1.6; margin-bottom: 20px; color: #a5a5cc;">
+            Upgrade to Premium to get personalised monthly spend and save recommendations based on your historical patterns, savings targets, and behavioral balance loops.
+          </p>
+          <button class="submit-btn premium-btn" onclick="triggerPremiumMockUpgrade()">Upgrade to Premium Tier</button>
+        </div>
+      `;
+      return;
+    }
+
+    // Capture Core Date Ranges
+    const currentMonthStr = getRelativeMonthString(0);
+    const m1Str = getRelativeMonthString(-1);
+    const m2Str = getRelativeMonthString(-2);
+    const m3Str = getRelativeMonthString(-3);
+
+    // Calculate Current Month Revenue Input
+    const currentIncomesSum = transactions
+      .filter(t => t.type === 'income' && t.date.startsWith(currentMonthStr))
+      .reduce((s, t) => s + t.amount, 0);
+
+    if (currentIncomesSum === 0) {
+      renderBox.innerHTML = `
+        <div class="panel premium-panel">
+          <div class="premium-tag">PRO</div>
+          <div class="panel-title premium-title">Smart Budget Tracker [${currentMonthStr}]</div>
+          <p style="font-size: 0.85rem; color: var(--muted); text-align: center; padding: 20px 0;">
+            Awaiting income ledger execution mapping for this calendar month interval.
+          </p>
+        </div>
+      `;
+      return;
+    }
+
+    // Step 1: Retrieve Carried-Over Reserve Token Value from Previous Month
+    let carriedOver = 0;
+    try {
+      const prevMonthDocRef = doc(db, "users", currentUser.uid, "months", m1Str);
+      const prevSnap = await getDoc(prevMonthDocRef);
+      if (prevSnap.exists()) {
+        carriedOver = prevSnap.data().toReserve || 0;
+      }
+    } catch (e) {
+      console.error("Historical carry-over extraction trace bypassed:", e);
+    }
+
+    // Step 2: Sum Total Available Capital
+    const totalAvailable = currentIncomesSum + carriedOver;
+
+    // Step 3: Historic Spending Audits (3 Months Deep Profile)
+    const getMonthExpenses = (mStr) => transactions.filter(t => t.type === 'expense' && t.date.startsWith(mStr)).reduce((s,t)=>s+t.amount,0);
+    const getMonthIncome = (mStr) => transactions.filter(t => t.type === 'income' && t.date.startsWith(mStr)).reduce((s,t)=>s+t.amount,0);
+
+    const expM1 = getMonthExpenses(m1Str);
+    const expM2 = getMonthExpenses(m2Str);
+    const expM3 = getMonthExpenses(m3Str);
+
+    let activeMonthsCount = 0;
+    let totalHistoricalExpenses = 0;
+    if (expM1 > 0) { activeMonthsCount++; totalHistoricalExpenses += expM1; }
+    if (expM2 > 0) { activeMonthsCount++; totalHistoricalExpenses += expM2; }
+    if (expM3 > 0) { activeMonthsCount++; totalHistoricalExpenses += expM3; }
+    const averageSpending = activeMonthsCount > 0 ? (totalHistoricalExpenses / activeMonthsCount) : 0;
+
+    // Step 4: Evaluate Behavior Matrix Overspending Triggers
+    const isOverspent = (mStr) => {
+      const inc = getMonthIncome(mStr);
+      const exp = getMonthExpenses(mStr);
+      return exp > inc && inc > 0;
+    };
+
+    const overspentM1 = isOverspent(m1Str);
+    const overspentM2 = isOverspent(m2Str);
+
+    // Step 5 & 6 & 7: Allocation Engine Ratios Calculations
+    let spendPercent = 60;
+    let reservePercent = 40;
+    let insight = "Your standard allocation matrix is active, keeping spending aligned with default savings boundaries.";
+
+    if (overspentM1 && overspentM2) {
+      reservePercent = 55; // +15% Reserve Shift
+      spendPercent = 45;
+      insight = "Consecutive overspending detected over the last two months. Your reserve threshold has been tightened by 15% to safeguard your balance.";
+    } else if (overspentM1) {
+      reservePercent = 48; // +8% Reserve Shift
+      spendPercent = 52;
+      insight = "You spent slightly more than your income last month. We have safely expanded your reserve pool to absorb the variance.";
+    } else if (activeMonthsCount > 0 && !overspentM1 && expM1 > 0) {
+      reservePercent = 35; // Allow up to 5% more spending
+      spendPercent = 65;
+      insight = "Excellent surplus management detected last month. You have unlocked up to 5% extra flexible spending capacity for this period.";
+    }
+
+    // Step 8: Overriding Calculations Against Savings Goals Target Vectors
+    try {
+      const goalRef = doc(db, "users", currentUser.uid, "savingsGoal", "current");
+      const goalSnap = await getDoc(goalRef);
+      if (goalSnap.exists()) {
+        const gData = goalSnap.data();
+        const targetAmount = gData.targetAmount;
+        const targetDate = new Date(gData.targetDate);
+        const today = new Date();
+
+        // Calculate time delta metrics
+        const totalMonthsRemaining = (targetDate.getFullYear() - today.getFullYear()) * 12 + (targetDate.getMonth() - today.getMonth());
+        
+        if (totalMonthsRemaining > 0 && targetAmount > carriedOver) {
+          const deficiency = targetAmount - carriedOver; 
+          const monthlyNeeded = deficiency / totalMonthsRemaining;
+          const targetNeededPercent = Math.ceil((monthlyNeeded / totalAvailable) * 100);
+
+          if (targetNeededPercent > reservePercent) {
+            reservePercent = targetNeededPercent;
+            spendPercent = 100 - reservePercent;
+            insight = `Prioritising your locked savings goal milestone. Adjusting your monthly allocation to secure the required monthly target.`;
+          }
+        }
+      }
+    } catch (goalErr) {
+      console.error("Savings Goal evaluation loop bypassed:", goalErr);
+    }
+
+    // Step 9: Enforcement of Operational Security Boundary Constraints
+    if (reservePercent < 20) {
+      reservePercent = 20;
+      spendPercent = 80;
+    }
+    if (spendPercent > 75) {
+      spendPercent = 75;
+      reservePercent = 25;
+    }
+
+    // Harmonize matching arrays
+    const totalCheck = spendPercent + reservePercent;
+    if(totalCheck !== 100) {
+      spendPercent = 100 - reservePercent;
+    }
+
+    const spendLimit = (spendPercent / 100) * totalAvailable;
+    const toReserve = (reservePercent / 100) * totalAvailable;
+
+    // Assemble Data Engine Export Document
+    const calculationExportPayload = {
+      newIncome: currentIncomesSum,
+      carriedOver,
+      totalAvailable,
+      spendLimit,
+      toReserve,
+      spendPercent,
+      reservePercent,
+      insight,
+      timestamp: Date.now()
+    };
+
+    // Push calculations payload out into users sub-collection
+    try {
+      const currentMonthDocRef = doc(db, "users", currentUser.uid, "months", currentMonthStr);
+      await setDoc(currentMonthDocRef, calculationExportPayload, { merge: true });
+    } catch (fsWriteErr) {
+      console.error("Failed persisting calculation schemas: ", fsWriteErr);
+    }
+
+    // Step 10: Display the Premium UI Card Workspace
+    renderBox.innerHTML = `
+      <div class="panel premium-panel">
+        <div class="premium-tag">PRO Tier Engine</div>
+        <div class="panel-title premium-title">Smart Budget Strategy — ${currentMonthStr}</div>
+        
+        <p style="font-size:0.8rem; color:var(--muted); margin-bottom: 4px;">Dynamic Monthly Liquidity Pool</p>
+        <div style="font-family:'Syne', sans-serif; font-size: 2.25rem; font-weight:800; color:var(--text); margin-bottom:4px;">
+          ${fmt(totalAvailable)}
+        </div>
+        <p style="font-size:0.65rem; color:var(--accent); letter-spacing:0.5px; margin-bottom:16px;">
+          (Current Revenue: ${fmt(currentIncomesSum)} + Carried Reserve: ${fmt(carriedOver)})
+        </p>
+
+        <div class="metric-row">
+          <div class="metric-box" style="border-left: 3px solid var(--accent2);">
+            <div style="font-size:0.65rem; color:var(--muted); text-transform:uppercase;">Spend Limit (${spendPercent}%)</div>
+            <div class="metric-val" style="color:var(--accent2);">${fmt(spendLimit)}</div>
+          </div>
+          <div class="metric-box" style="border-left: 3px solid var(--gold);">
+            <div style="font-size:0.65rem; color:var(--muted); text-transform:uppercase;">To Reserve (${reservePercent}%)</div>
+            <div class="metric-val" style="color:var(--gold);">${fmt(toReserve)}</div>
+          </div>
+        </div>
+
+        <div class="progress-container">
+          <div class="progress-fill-spend" style="width: ${spendPercent}%"></div>
+          <div class="progress-fill-reserve" style="width: ${reservePercent}%"></div>
+        </div>
+
+        <p style="font-size:0.8rem; line-height:1.5; color:#c1c1df; font-style:italic; background:rgba(255,255,255,0.02); padding:12px; border-radius:8px; border:1px solid rgba(255,255,255,0.04);">
+          ⚡ "${insight}"
+        </p>
+      </div>
+    `;
+  }
+  /* ========================================================================= */
 
   function switchScreen(screenId, btnId) {
     document.getElementById('dashboardScreen').classList.add('hidden');
@@ -569,11 +920,11 @@
     } else if (income === 0 && expense > 0) {
       advice = `⚠️ <strong>Warning, ${userName}:</strong> Expenses exist without recorded income. Log incoming revenue.`;
     } else if (expense > income * 0.8) {
-      advice = `🚨 <strong>Alert:</strong> Spending is above 80% of earnings! Review high-priority fields.`;
+      advice = `🚨 <strong>Alert:</strong> Spending is over 80% of earnings! Review your luxury expenses.`;
     } else if (expense > income * 0.5) {
-      advice = `⚖️ <strong>Steady, ${userName}:</strong> Moderate outflows detected. Accumulate standard margins.`;
+      advice = `⚖️ <strong>Steady, ${userName}:</strong> Moderate outflows detected. Save 20% of remaining balance for security.`;
     } else {
-      advice = `🚀 <strong>Great job, ${userName}!</strong> Outflows are controlled under 50%. Allocate surplus cleanly.`;
+      advice = `🚀 <strong>Great job, ${userName}!</strong> Outflows are controlled under 50%. Allocate surplus cleanly into safe structures.`;
     }
 
     adviceBox.innerHTML = `
@@ -709,7 +1060,7 @@
     `).join('');
   }
 
-  // Bind handlers globally to allow modular scope compatibility with HTML onclick calls
+  // Handle cross-scope functional visibility requirements
   window.handleLogin = handleLogin;
   window.completeOnboarding = completeOnboarding;
   window.switchScreen = switchScreen;
@@ -717,6 +1068,8 @@
   window.selectCat = selectCat;
   window.addTransaction = addTransaction;
   window.deleteTransaction = deleteTransaction;
+  window.triggerPremiumMockUpgrade = triggerPremiumMockUpgrade;
+  window.saveSavingsGoal = saveSavingsGoal;
 </script>
 </body>
 </html>
