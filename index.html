@@ -688,24 +688,9 @@
     d.setMonth(d.getMonth() + offsetMonths);
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
   }
-
-  async function executeSmartBudgetEngine() {
+async function executeSmartBudgetEngine() {
     const renderBox = document.getElementById('smartBudgetContainer');
     if (!renderBox) return;
-
-    if (!isPremiumUser) {
-      renderBox.innerHTML = `
-        <div class="panel premium-panel">
-          <div class="premium-tag">Premium Upgrade</div>
-          <div class="panel-title premium-title">Unlock Smart Budget Analysis</div>
-          <p style="font-size: 0.9rem; line-height: 1.6; margin-bottom: 20px; color: #a5a5cc;">
-            Upgrade to Premium to get personalised monthly spend and save recommendations based on your historical patterns, savings targets, and behavioral balance loops.
-          </p>
-          <button class="submit-btn premium-btn" onclick="triggerPremiumMockUpgrade()">Upgrade to Premium Tier</button>
-        </div>
-      `;
-      return;
-    }
 
     // Capture Core Date Ranges
     const currentMonthStr = getRelativeMonthString(0);
@@ -720,9 +705,8 @@
 
     if (currentIncomesSum === 0) {
       renderBox.innerHTML = `
-        <div class="panel premium-panel">
-          <div class="premium-tag">PRO</div>
-          <div class="panel-title premium-title">Smart Budget Tracker [${currentMonthStr}]</div>
+        <div class="panel">
+          <div class="panel-title">Smart Budget Tracker [${currentMonthStr}]</div>
           <p style="font-size: 0.85rem; color: var(--muted); text-align: center; padding: 20px 0;">
             Awaiting income ledger execution mapping for this calendar month interval.
           </p>
@@ -777,15 +761,15 @@
     let insight = "Your standard allocation matrix is active, keeping spending aligned with default savings boundaries.";
 
     if (overspentM1 && overspentM2) {
-      reservePercent = 55; // +15% Reserve Shift
+      reservePercent = 55; 
       spendPercent = 45;
       insight = "Consecutive overspending detected over the last two months. Your reserve threshold has been tightened by 15% to safeguard your balance.";
     } else if (overspentM1) {
-      reservePercent = 48; // +8% Reserve Shift
+      reservePercent = 48; 
       spendPercent = 52;
       insight = "You spent slightly more than your income last month. We have safely expanded your reserve pool to absorb the variance.";
     } else if (activeMonthsCount > 0 && !overspentM1 && expM1 > 0) {
-      reservePercent = 35; // Allow up to 5% more spending
+      reservePercent = 35; 
       spendPercent = 65;
       insight = "Excellent surplus management detected last month. You have unlocked up to 5% extra flexible spending capacity for this period.";
     }
@@ -800,7 +784,6 @@
         const targetDate = new Date(gData.targetDate);
         const today = new Date();
 
-        // Calculate time delta metrics
         const totalMonthsRemaining = (targetDate.getFullYear() - today.getFullYear()) * 12 + (targetDate.getMonth() - today.getMonth());
         
         if (totalMonthsRemaining > 0 && targetAmount > carriedOver) {
@@ -859,11 +842,10 @@
       console.error("Failed persisting calculation schemas: ", fsWriteErr);
     }
 
-    // Step 10: Display the Premium UI Card Workspace
+    // Step 10: Display the UI Card Workspace (Cleaned of Premium/PRO labels)
     renderBox.innerHTML = `
-      <div class="panel premium-panel">
-        <div class="premium-tag">PRO Tier Engine</div>
-        <div class="panel-title premium-title">Smart Budget Strategy — ${currentMonthStr}</div>
+      <div class="panel">
+        <div class="panel-title">Smart Budget Strategy — ${currentMonthStr}</div>
         
         <p style="font-size:0.8rem; color:var(--muted); margin-bottom: 4px;">Dynamic Monthly Liquidity Pool</p>
         <div style="font-family:'Syne', sans-serif; font-size: 2.25rem; font-weight:800; color:var(--text); margin-bottom:4px;">
@@ -895,181 +877,6 @@
       </div>
     `;
   }
-  /* ========================================================================= */
-
-  function switchScreen(screenId, btnId) {
-    document.getElementById('dashboardScreen').classList.add('hidden');
-    document.getElementById('coachScreen').classList.add('hidden');
-    document.getElementById('navDashboard').classList.remove('active');
-    document.getElementById('navCoach').classList.remove('active');
-
-    document.getElementById(screenId).classList.remove('hidden');
-    document.getElementById(btnId).classList.add('active');
-
-    if (screenId === 'coachScreen') generateAdvice();
-  }
-
-  function generateAdvice() {
-    const income = transactions.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0);
-    const expense = transactions.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
-    const adviceBox = document.getElementById('coachingAdvice');
-
-    let advice = "";
-    if (income === 0 && expense === 0) {
-      advice = `👋 <strong>Welcome, ${userName}!</strong> Add transactions so I can start analyzing your workspace.`;
-    } else if (income === 0 && expense > 0) {
-      advice = `⚠️ <strong>Warning, ${userName}:</strong> Expenses exist without recorded income. Log incoming revenue.`;
-    } else if (expense > income * 0.8) {
-      advice = `🚨 <strong>Alert:</strong> Spending is over 80% of earnings! Review your luxury expenses.`;
-    } else if (expense > income * 0.5) {
-      advice = `⚖️ <strong>Steady, ${userName}:</strong> Moderate outflows detected. Save 20% of remaining balance for security.`;
-    } else {
-      advice = `🚀 <strong>Great job, ${userName}!</strong> Outflows are controlled under 50%. Allocate surplus cleanly into safe structures.`;
-    }
-
-    adviceBox.innerHTML = `
-      <div style="margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--border);">
-        <div style="color: var(--income); margin-bottom: 4px; font-size: 1.2rem;"><strong>Total Income:</strong> $${income.toFixed(2)}</div>
-        <div style="color: var(--expense); font-size: 1.2rem;"><strong>Total Expenses:</strong> $${expense.toFixed(2)}</div>
-      </div>
-      <p style="font-size: 1.1rem;">${advice}</p>
-    `;
-  }
-
-  function setType(type) {
-    currentType = type;
-    selectedCat = '';
-    document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
-    document.querySelector(`.type-btn.${type}`).classList.add('active');
-    renderCategories();
-  }
-
-  function renderCategories() {
-    const cats = currentType === 'income' ? incomeCategories : expenseCategories;
-    const el = document.getElementById('catChips');
-    el.innerHTML = cats.map(c => `
-      <button class="cat-chip ${selectedCat === c ? 'selected' : ''}" onclick="selectCat('${c}')">${c}</button>
-    `).join('');
-  }
-
-  function selectCat(cat) {
-    selectedCat = cat;
-    renderCategories();
-  }
-
-  async function addTransaction() {
-    const desc = document.getElementById('desc').value.trim();
-    const amount = parseFloat(document.getElementById('amount').value);
-    const date = document.getElementById('date').value;
-
-    if (!desc || !amount || amount <= 0 || !currentUser) {
-      alert("Please enter a valid description and amount.");
-      return;
-    }
-
-    const tx = {
-      uid: currentUser.uid,
-      id: Date.now(),
-      type: currentType,
-      desc,
-      amount,
-      category: selectedCat || '📦 Other',
-      date: date || new Date().toISOString().split('T')[0]
-    };
-
-    try {
-      await addDoc(collection(db, "transactions"), tx);
-      document.getElementById('desc').value = '';
-      document.getElementById('amount').value = '';
-      await loadTransactions();
-    } catch(err) {
-      alert("Error uploading item: " + err.message);
-    }
-  }
-
-  async function deleteTransaction(docId) {
-    if (!docId) return;
-    try {
-      await deleteDoc(doc(db, "transactions", docId));
-      await loadTransactions();
-    } catch(err) {
-      alert("Error deleting file: " + err.message);
-    }
-  }
-
-  function fmt(n) {
-    return '$' + n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-  }
-
-  function render() {
-    const income = transactions.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0);
-    const expense = transactions.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
-    const balance = income - expense;
-
-    document.getElementById('totalIncome').textContent = fmt(income);
-    document.getElementById('totalExpense').textContent = fmt(expense);
-    const balEl = document.getElementById('netBalance');
-    balEl.textContent = fmt(balance);
-    balEl.style.color = balance >= 0 ? 'var(--accent3)' : 'var(--expense)';
-
-    const list = document.getElementById('txList');
-    if (transactions.length === 0) {
-      list.innerHTML = `<div class="empty-state"><span class="emoji">💳</span>No transactions yet.<br>Add your first one →</div>`;
-    } else {
-      list.innerHTML = transactions.map(t => `
-        <div class="tx-item">
-          <div class="tx-left">
-            <div class="tx-icon ${t.type}">${t.type === 'income' ? '↑' : '↓'}</div>
-            <div>
-              <div class="tx-name">${t.desc}</div>
-              <div class="tx-meta">${t.category} · ${t.date}</div>
-            </div>
-          </div>
-          <div style="display:flex;align-items:center;">
-            <div class="tx-amount ${t.type}">${t.type === 'income' ? '+' : '-'}${fmt(t.amount)}</div>
-            <button class="tx-delete" onclick="deleteTransaction('${t.docId}')">✕</button>
-          </div>
-        </div>
-      `).join('');
-    }
-    renderChart();
-  }
-
-  function renderChart() {
-    const months = [];
-    for (let i = 5; i >= 0; i--) {
-      const d = new Date();
-      d.setMonth(d.getMonth() - i);
-      const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
-      const label = d.toLocaleString('default', { month: 'short' });
-      const inc = transactions.filter(t => t.type === 'income' && t.date.startsWith(key)).reduce((s,t) => s+t.amount, 0);
-      const exp = transactions.filter(t => t.type === 'expense' && t.date.startsWith(key)).reduce((s,t) => s+t.amount, 0);
-      months.push({ label, inc, exp });
-    }
-
-    const max = Math.max(...months.map(m => Math.max(m.inc, m.exp)), 1);
-    const barsEl = document.getElementById('chartBars');
-    barsEl.innerHTML = months.map(m => `
-      <div class="bar-wrap">
-        <div style="display:flex;gap:2px;align-items:flex-end;width:100%;height:70px;">
-          <div class="bar income-bar" style="height:${(m.inc/max)*70}px;flex:1;"></div>
-          <div class="bar expense-bar" style="height:${(m.exp/max)*70}px;flex:1;"></div>
-        </div>
-        <div class="bar-label">${m.label}</div>
-      </div>
-    `).join('');
-  }
-
-  // Handle cross-scope functional visibility requirements
-  window.handleLogin = handleLogin;
-  window.completeOnboarding = completeOnboarding;
-  window.switchScreen = switchScreen;
-  window.setType = setType;
-  window.selectCat = selectCat;
-  window.addTransaction = addTransaction;
-  window.deleteTransaction = deleteTransaction;
-  window.triggerPremiumMockUpgrade = triggerPremiumMockUpgrade;
-  window.saveSavingsGoal = saveSavingsGoal;
 </script>
 </body>
 </html>
