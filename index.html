@@ -39,19 +39,17 @@
         <button id="addTransactionBtn">Add Transaction</button>
 
         <h3>Your Transactions</h3>
-        <div id="transactionsList">
-            </div>
+        <div id="transactionsList"></div>
     </div>
 
     <script type="module">
-        // 1. Import Firebase Core, Auth, and Firestore
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
         import { getFirestore, collection, addDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-        // 2. PASTE YOUR FIREBASE CONFIG HERE
+        // REPLACE WITH YOUR ACTUAL COPIED FIREBASE CONFIG KEYS
         const firebaseConfig = {
-            apiKey: "AIzaSyAkBKhyDepFOkpE0II9GgjwSO5G1CH9A_4",
+            apiKey: "YOUR_API_KEY_HERE",
             authDomain: "index-1d611.firebaseapp.com",
             projectId: "your-project-id",
             storageBucket: "your-project-id.appspot.com",
@@ -59,20 +57,14 @@
             appId: "1:123456789:web:abcdefg"
         };
 
-        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // UI Elements
         const loginScreen = document.getElementById('loginScreen');
         const dashboardScreen = document.getElementById('dashboardScreen');
         const authError = document.getElementById('authError');
         const transactionsList = document.getElementById('transactionsList');
-
-        // ==========================================
-        // AUTHENTICATION LOGIC
-        // ==========================================
 
         // Sign Up
         document.getElementById('signupBtn').addEventListener('click', async () => {
@@ -80,7 +72,7 @@
             const password = document.getElementById('passwordInput').value;
             try {
                 await createUserWithEmailAndPassword(auth, email, password);
-                authError.innerText = ""; // Clear errors
+                authError.innerText = ""; 
             } catch (error) {
                 authError.innerText = error.message;
             }
@@ -103,26 +95,20 @@
             signOut(auth);
         });
 
-        // Listen for Login State Changes (The "Gatekeeper")
+        // Auth State Listener
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                // User is logged in: Show Dashboard, load their specific data
                 loginScreen.classList.add('hidden');
                 dashboardScreen.classList.remove('hidden');
                 document.getElementById('userEmailDisplay').innerText = user.email;
                 loadTransactions(user.uid); 
             } else {
-                // User is logged out: Show Login screen
                 loginScreen.classList.remove('hidden');
                 dashboardScreen.classList.add('hidden');
             }
         });
 
-        // ==========================================
-        // DATABASE LOGIC (FIRESTORE)
-        // ==========================================
-
-        // Add Data to Database
+        // Add Transaction
         document.getElementById('addTransactionBtn').addEventListener('click', async () => {
             const desc = document.getElementById('descInput').value;
             const amount = document.getElementById('amountInput').value;
@@ -130,41 +116,47 @@
 
             if (desc && amount && user) {
                 try {
-                    // Save to the "transactions" collection
                     await addDoc(collection(db, "transactions"), {
-                        uid: user.uid,         // Links the data to the specific logged-in user
+                        uid: user.uid,         
                         description: desc,
                         amount: Number(amount),
                         timestamp: new Date()
                     });
                     
-                    // Clear inputs and reload list
                     document.getElementById('descInput').value = '';
                     document.getElementById('amountInput').value = '';
                     loadTransactions(user.uid);
                 } catch (error) {
-                    console.error("Error adding document: ", error);
+                    alert("Error saving transaction: " + error.message);
                 }
             }
         });
 
-        // Load Data from Database
+        // Load Transactions (Fixed to catch silent database errors)
         async function loadTransactions(userId) {
             transactionsList.innerHTML = "Loading...";
-            
-            // Query: Get transactions ONLY where the uid matches the logged-in user
-            const q = query(collection(db, "transactions"), where("uid", "==", userId));
-            const querySnapshot = await getDocs(q);
-            
-            transactionsList.innerHTML = ""; // Clear loading text
-            
-            querySnapshot.forEach((doc) => {
-                const data = doc.data();
-                const div = document.createElement('div');
-                div.className = 'transaction-item';
-                div.innerHTML = `<span>${data.description}</span> <span>$${data.amount}</span>`;
-                transactionsList.appendChild(div);
-            });
+            try {
+                const q = query(collection(db, "transactions"), where("uid", "==", userId));
+                const querySnapshot = await getDocs(q);
+                
+                transactionsList.innerHTML = ""; 
+                
+                if (querySnapshot.empty) {
+                    transactionsList.innerHTML = "<p style='color: gray; font-size: 14px;'>No transactions found.</p>";
+                    return;
+                }
+
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    const div = document.createElement('div');
+                    div.className = 'transaction-item';
+                    div.innerHTML = `<span>${data.description}</span> <span>$${data.amount}</span>`;
+                    transactionsList.appendChild(div);
+                });
+            } catch (error) {
+                // Displays the real issue right on the screen if Firestore blocks it
+                transactionsList.innerHTML = `<p style="color: red; font-size: 14px;">Database Error: ${error.message}</p>`;
+            }
         }
     </script>
 </body>
